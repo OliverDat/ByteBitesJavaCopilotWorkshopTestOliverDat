@@ -5,10 +5,13 @@ import java.util.Scanner;
 
 public class Main {
 
-    private static final String[] DISHES = {
-            "Festivalburger",
-            "Sprøde fritter",
-            "Vegansk bowl"
+    private record Dish(String name, int price) {
+    }
+
+    private static final Dish[] DISHES = {
+            new Dish("Festivalburger", 59),
+            new Dish("Sprøde fritter", 35),
+            new Dish("Vegansk bowl", 65)
     };
 
     public static void main(String[] args) {
@@ -48,7 +51,8 @@ public class Main {
         System.out.println("Retter:");
 
         for (int i = 0; i < DISHES.length; i++) {
-            System.out.printf("%d. %s%n", i + 1, DISHES[i]);
+            Dish dish = DISHES[i];
+            System.out.printf("%d. %s - %d kr.%n", i + 1, dish.name(), dish.price());
         }
     }
 }
