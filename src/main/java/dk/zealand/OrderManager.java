@@ -17,6 +17,49 @@ public class OrderManager {
         return order;
     }
 
+    public Order findOrderById(int id) {
+        for (Order order : orders) {
+            if (order.getId() == id) {
+                return order;
+            }
+        }
+        return null;
+    }
+
+    public boolean markOrderAsReady(int id) {
+        Order order = findOrderById(id);
+        if (order == null) {
+            return false;
+        }
+        if ("KLAR".equals(order.getStatus())) {
+            return false;
+        }
+        order.setStatus("KLAR");
+        return true;
+    }
+
+    public boolean cancelOrder(int id) {
+        Order order = findOrderById(id);
+        if (order == null) {
+            return false;
+        }
+        if ("KLAR".equals(order.getStatus())) {
+            return false;
+        }
+        order.setStatus("ANNULLERET");
+        return true;
+    }
+
+    public int countPendingOrders() {
+        int count = 0;
+        for (Order order : orders) {
+            if ("MODTAGET".equals(order.getStatus())) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     public List<Order> getOrders() {
         return new ArrayList<>(orders);
     }
