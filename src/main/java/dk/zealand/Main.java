@@ -1,5 +1,6 @@
 package dk.zealand;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -28,9 +29,12 @@ public class Main {
             switch (choice) {
                 case "1" -> showDishes();
                 case "2" -> createOrder(scanner);
+                case "3" -> markOrderAsReady(scanner);
+                case "4" -> showPendingCount();
+                case "5" -> cancelOrder(scanner);
                 case "0" -> running = false;
                 default -> System.out.println(
-                        "Ugyldigt valg. Vælg 0, 1 eller 2."
+                        "Ugyldigt valg. Vælg 0, 1, 2, 3, 4 eller 5."
                 );
             }
         }
@@ -42,6 +46,9 @@ public class Main {
         System.out.println();
         System.out.println("1. Vis retter");
         System.out.println("2. Opret bestilling");
+        System.out.println("3. Markér bestilling som klar");
+        System.out.println("4. Vis antal ventende bestillinger");
+        System.out.println("5. Annullér bestilling");
         System.out.println("0. Afslut");
         System.out.print("Vælg: ");
     }
@@ -102,6 +109,85 @@ public class Main {
             System.out.println("✓ " + order);
         } else {
             System.out.println("Bestillingen kunne ikke oprettes.");
+        }
+    }
+
+    private static void markOrderAsReady(Scanner scanner) {
+        List<Order> orders = orderManager.getOrders();
+        if (orders.isEmpty()) {
+            System.out.println("Der er ingen bestillinger.");
+            return;
+        }
+
+        System.out.println();
+        System.out.println("Bestillinger:");
+        for (Order order : orders) {
+            System.out.println(order);
+        }
+
+        System.out.print("Vælg bestilling id: ");
+        String idStr = scanner.nextLine().trim();
+
+        int orderId;
+        try {
+            orderId = Integer.parseInt(idStr);
+        } catch (NumberFormatException e) {
+            System.out.println("Ugyldigt input. Id skal være et tal.");
+            return;
+        }
+
+        if (orderManager.markOrderAsReady(orderId)) {
+            Order order = orderManager.findOrderById(orderId);
+            System.out.println("✓ " + order);
+        } else {
+            Order order = orderManager.findOrderById(orderId);
+            if (order == null) {
+                System.out.println("Bestilling med id " + orderId + " findes ikke.");
+            } else if ("KLAR".equals(order.getStatus())) {
+                System.out.println("Bestillingen er allerede markeret som klar.");
+            }
+        }
+    }
+
+    private static void showPendingCount() {
+        int pendingCount = orderManager.countPendingOrders();
+        System.out.println("Antal ventende bestillinger: " + pendingCount);
+    }
+
+    private static void cancelOrder(Scanner scanner) {
+        List<Order> orders = orderManager.getOrders();
+        if (orders.isEmpty()) {
+            System.out.println("Der er ingen bestillinger.");
+            return;
+        }
+
+        System.out.println();
+        System.out.println("Bestillinger:");
+        for (Order order : orders) {
+            System.out.println(order);
+        }
+
+        System.out.print("Vælg bestilling id: ");
+        String idStr = scanner.nextLine().trim();
+
+        int orderId;
+        try {
+            orderId = Integer.parseInt(idStr);
+        } catch (NumberFormatException e) {
+            System.out.println("Ugyldigt input. Id skal være et tal.");
+            return;
+        }
+
+        if (orderManager.cancelOrder(orderId)) {
+            Order order = orderManager.findOrderById(orderId);
+            System.out.println("✓ " + order);
+        } else {
+            Order order = orderManager.findOrderById(orderId);
+            if (order == null) {
+                System.out.println("Bestilling med id " + orderId + " findes ikke.");
+            } else if ("KLAR".equals(order.getStatus())) {
+                System.out.println("En klar bestilling kan ikke annulleres.");
+            }
         }
     }
 }
